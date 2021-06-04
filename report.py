@@ -1,5 +1,8 @@
 import csv
 import matplotlib.pyplot as plt
+from textreports import report_txtinv, report_txtprod, report_txtrev, report_txtprofit, report_txtbought, report_txtsold
+from csvreports import report_csvitems, report_csvrow
+from graphreport import report_graph
 from sell import read_sold
 from buy import read_bought
 from datetime import datetime, timedelta
@@ -30,7 +33,6 @@ def report_inventory(report_date, exportcsv, showgraph):
 
     # Read products bought and create list with all products
     bought = read_bought(report_date)
-    productlist = []
     productlist = set([item[1][0] for item in bought.items()])
 
     # Read products sold and remove sold products from bought list
@@ -76,57 +78,16 @@ def report_inventory(report_date, exportcsv, showgraph):
     # Check if output data available
     if len(outputlist) != 0:
 
-        # Export inventory to REPORT.CSV
-        if exportcsv:
-            try:
-                file = open('report.csv', 'w+', newline='')
-                with file:
-                    write = csv.writer(file)
-                    write.writerows(outputlist)
-                return 'Report exported to REPORT.CSV'
-            except BaseException:
-                return 'ERROR, in creating datafile REPORT.CSV'
+        if exportcsv: 
+            # Export inventory to REPORT.CSV
+            return report_csvitems(outputlist)          
+        elif showgraph:
+            # Export inventory as bar-graph
+            return report_graph(outputlist, report_date)
+        else:  
+            # Create text report
+            return report_txtinv(outputlist, report_date)  
 
-        # Show bar graph for inventory
-        if showgraph:
-
-            # Set values X/Y axis
-            x = [item[0] for item in outputlist]
-            y1 = [item[1] for item in outputlist]
-            y2 = [item[2] for item in outputlist]
-
-            # Define graph + labels
-            plt.bar(x, y1, color='g')
-            plt.bar(x, y2, bottom=y1, color='r')
-            plt.title(f'Inventory on {report_date}')
-            plt.xlabel('Products')
-            plt.ylabel('Number')
-            plt.legend(["In stock", "Expired"])
-
-            # Show graph
-            plt.show()
-
-            return 'Inventory bar-graph showed'
-
-        # Create inventory text report
-        else:
-
-           # Header
-            report_out = f'\n********** INVENTORY REPORT ON {report_date} **********'
-            report_out += '\n+=============================+==========+=========+'
-            report_out += '\n| Product Name                | In stock | Expired |'
-            report_out += '\n+-----------------------------+----------+---------+'
-
-            # Data
-            for item in outputlist:
-                report_out += "\n| " + item[0].ljust(28) + "|"
-                report_out += str(item[1]).center(10) + "|"
-                report_out += str(item[2]).center(9) + "|"
-
-            # Footer
-            report_out += '\n+=============================+==========+=========+'
-
-            return report_out
     else:
         return 'No data available'
 
@@ -142,34 +103,18 @@ def report_products(report_date, exportcsv):
 
     # Read products bought and create list with all products
     bought = read_bought(report_date)
-    productlist = []
+    #productlist = []
     productlist = set([item[1][0] for item in bought.items()])
 
-    # Check if output data available
+    # Check if output data available, if so report data
     if len(productlist) != 0:
 
-        # Export inventory to REPORT.CSV
-        if exportcsv:
-            try:
-                with open('report.csv', 'w') as export:
-                    export_writer = csv.writer(export, lineterminator='\n')
-                    for item in productlist:
-                        export_writer.writerow([item])
-                return 'Data exported to REPORT.CSV'
-            except BaseException:
-                return 'ERROR, in creating datafile REPORT.CSV'
-
-        # Create text report
-        else:
-            if month_flag:
-                reportdate = datetime.strptime(report_date + '-01'.strip("'"),
-                                               '%Y-%m-%d')
-                report_date = reportdate.strftime("%B %Y")
-
-            report_out = f'\nProducts bought until {report_date}: '
-            for item in productlist:
-                report_out += item + ", "
-            return report_out[:-2]
+        if exportcsv: 
+            # Export inventory to REPORT.CSV
+            return report_csvrow(productlist)                           
+        else:         
+            # Create text report
+            return report_txtprod(productlist, report_date, month_flag) 
 
     else:
         return 'No data available'
@@ -190,34 +135,17 @@ def report_revenue(report_date, exportcsv):
     # Sumarize all prices in sold
     revenue = sum(item[1][2] for item in sold.items())
 
-    # Check if output data available
-    if len(sold) != 0:
-
+    # Report data
+    if exportcsv: 
         # Export inventory to REPORT.CSV
-        if exportcsv:
-            try:
-                with open('report.csv', 'w') as export:
-                    export_writer = csv.writer(export, lineterminator='\n')
-                    export_writer.writerow([revenue])
-                return 'Data exported to REPORT.CSV'
-            except BaseException:
-                return 'ERROR, in creating datafile REPORT.CSV'
-
+        return report_csvrow(revenue)                           
+    else:         
         # Create text report
-        else:
-            if month_flag:
-                reportdate = datetime.strptime(report_date + '-01'.strip("'"),
-                                               '%Y-%m-%d')
-                report_date = reportdate.strftime("%B %Y")
-            return '\nRevenu on ' + report_date + \
-                ': EUR {:.2f}'.format(revenue)
-    else:
-        return 'No data available'
+        return report_txtrev(revenue, report_date, month_flag)  
 
 # ---------------------------------------------------------------------------------------------
 # Report profit on report-date
 # ---------------------------------------------------------------------------------------------
-
 
 def report_profit(report_date, exportcsv):
 
@@ -234,29 +162,14 @@ def report_profit(report_date, exportcsv):
     # Sumarize all prices in sold column 2
     total_sold = Finance('sold', sold, 2)
 
-    # Check if output data available
+    # Check if output data available, if so report data
     if (len(bought) != 0) or (len(sold) != 0):
-
-        # Export inventory to REPORT.CSV
-        if exportcsv:
-            try:
-                with open('report.csv', 'w') as export:
-                    export_writer = csv.writer(export, lineterminator='\n')
-                    export_writer.writerow(
-                        [round(total_sold.amount - total_bought.amount, 2)])
-                return 'Data exported to REPORT.CSV'
-            except BaseException:
-                return 'ERROR, in creating datafile REPORT.CSV'
-
-        # Create text report
+        if exportcsv: 
+            # Export inventory to REPORT.CSV
+            return report_csvrow(round(total_sold.amount - total_bought.amount, 2))                  
         else:
-            if month_flag:
-                reportdate = datetime.strptime(report_date + '-01'.strip("'"),
-                                               '%Y-%m-%d')
-                report_date = reportdate.strftime("%B %Y")
-
-            return '\nProfit on ' + report_date + \
-                ': EUR {:.2f}'.format(total_sold.amount - total_bought.amount)
+            # Create text report
+            return report_txtprofit(total_sold.amount - total_bought.amount, report_date, month_flag)   
     else:
         return 'No data available'
 
@@ -273,59 +186,23 @@ def report_bought(report_date, exportcsv):
     # Read bought products
     bought = read_bought(report_date)
 
+    # Create outputlist
+    for key in bought:
+        name_out = bought[key][0]
+        buydate_out = bought[key][1]
+        price_out = bought[key][2]
+        expdate_out = bought[key][3]
+        outputlist.append([name_out, buydate_out, price_out, expdate_out])
+
     # Check if output data available
     if len(bought) != 0:
 
-        # Export inventory to REPORT.CSV
         if exportcsv:
-            try:
-                with open('report.csv', 'w') as export:
-                    export_writer = csv.writer(export, lineterminator='\n')
-                    for key in bought:
-                        name_out = bought[key][0]
-                        buydate_out = bought[key][1]
-                        price_out = bought[key][2]
-                        expdate_out = bought[key][3]
-                        export_writer.writerow(
-                            [name_out, buydate_out, price_out, expdate_out])
-                return 'Data exported to REPORT.CSV'
-            except BaseException:
-                return 'ERROR, in creating datafile REPORT.CSV'
-
-        # Create text report
+            # Export inventory to REPORT.CSV
+            return report_csvitems(outputlist)
         else:
-
-            # Check if data has to be reported
-            if len(bought) != 0:
-
-                # Header
-                if month_flag:
-                    reportdate = datetime.strptime(
-                        report_date + '-01'.strip("'"), '%Y-%m-%d')
-                    report_date = reportdate.strftime("%B %Y")
-
-                report_out = f'\n************ BOUGHT REPORT ON {report_date} ***********'
-                report_out += '\n+==============+============+=========+============+'
-                report_out += '\n| Product Name |  Buy date  |  Price  |  Exp.date  |'
-                report_out += '\n+--------------+------------+---------+------------+'
-
-                # Data
-                for key in bought:
-                    report_out += "\n| " + bought[key][0].ljust(13) + "|"
-                    report_out += bought[key][1].replace(
-                        "'", "").center(12) + "|"
-                    report_out += "{:.2f}".format(
-                        bought[key][2]).center(9) + "|"
-                    report_out += bought[key][3].replace(
-                        "'", "").center(12) + "|"
-
-                # Footer
-                report_out += '\n+==============+============+=========+============+'
-
-            else:
-                report_out = 'No data available.'
-
-            return report_out
+            # Create text report
+            return report_txtbought(bought, report_date, month_flag)
 
     else:
         return 'No data available'
@@ -362,10 +239,9 @@ def report_sold(report_date, exportcsv):
 
     try:
         if month_flag:
-            report_date += '-01'
-
-        # Convert dates to date objects and calculate end of month date
-        startdate = datetime.strptime(report_date.strip("'"), '%Y-%m-%d')
+            startdate = datetime.strptime(report_date + '-01'.strip("'"), '%Y-%m-%d')
+        else:
+            startdate = datetime.strptime(report_date.strip("'"), '%Y-%m-%d')
         enddate = (startdate.replace(day=1) +
                    timedelta(days=32)).replace(day=1) - timedelta(days=1)
 
@@ -381,55 +257,20 @@ def report_sold(report_date, exportcsv):
             expdate = datetime.strptime(bought[key][3].strip("'"), '%Y-%m-%d')
             if month_flag:
                 if (expdate >= startdate) and (expdate <= enddate):
-                    outputlist.append(
-                        [name, sold_date, sold_price, bought[key][3]])
+                    outputlist.append([name, sold_date, sold_price, bought[key][3]])
             else:
                 if startdate >= expdate:
-                    outputlist.append(
-                        [name, sold_date, sold_price, bought[key][3]])
+                    outputlist.append([name, sold_date, sold_price, bought[key][3]])
 
     # Check if output data available
     if len(outputlist) != 0:
 
         # Export inventory to REPORT.CSV
         if exportcsv:
-            try:
-                file = open('report.csv', 'w+', newline='')
-                with file:
-                    write = csv.writer(file)
-                    write.writerows(outputlist)
-                return 'Report exported to REPORT.CSV'
-            except BaseException:
-                return 'ERROR, in creating datafile REPORT.CSV'
-
-        # Create text report
+            return report_csvitems(outputlist)
         else:
-
-            # Header
-            if month_flag:
-                reportdate = datetime.strptime(
-                    report_date.strip("'"), '%Y-%m-%d')
-                report_date = reportdate.strftime("%B %Y")
-
-            report_out = f'\n******* SOLD + EXPIRED REPORT ON {report_date} ********'
-            report_out += '\n+==============+============+=========+============+'
-            report_out += '\n| Product Name |  Sold date |  Price  |  Exp.date  |'
-            report_out += '\n+--------------+------------+---------+------------+'
-
-            # Data
-            for item in outputlist:
-                report_out += "\n| " + item[0].ljust(13) + "|"
-                report_out += item[1].replace("'", "").center(12) + "|"
-                if item[2] != '-':
-                    report_out += "{:.2f}".format(item[2]).center(9) + "|"
-                else:
-                    report_out += '-'.center(9) + "|"
-                report_out += item[3].replace("'", "").center(12) + "|"
-
-            # Footer
-            report_out += '\n+==============+============+=========+============+'
-
-            return report_out
+            # Create text report
+            return report_txtsold(outputlist, report_date, month_flag)
     else:
         return 'No data available'
 
@@ -486,12 +327,13 @@ def main():
     print(report_revenue('2021-02-04', False))
     print(report_revenue('2021-03', False))
     print(report_profit('2021-01-08', False))
+    print(report_profit('2021-01-08', True))
     print(report_profit('2021-02', False))
     print(report_products('2021-01-01', False))
     print(report_products('2021-01', False))
-    print(report_bought('2021-03-01', False))
+    print(report_bought('2021-03-01', True))
     print(report_bought('2021-03', False))
-    print(report_sold('2021-01-12', False))
+    print(report_sold('2021-01-12', True))
     print(report_sold('2021-01', False))
     return
 
