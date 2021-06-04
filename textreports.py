@@ -1,4 +1,5 @@
 from datetime import datetime
+from utils import month_flag
 
 # Define constants
 footer_inventory  = '\n+=============================+==========+=========+'
@@ -35,9 +36,9 @@ def report_txtinv(reportlist, report_date):
 # Create text report for products
 #==========================================================================================
 
-def report_txtprod(productlist, report_date, month_flag):
+def report_txtprod(productlist, report_date):
 
-    if month_flag:
+    if month_flag(report_date):
         reportdate = datetime.strptime(report_date + '-01'.strip("'"),
                                         '%Y-%m-%d')
         report_date = reportdate.strftime("%B %Y")
@@ -52,9 +53,9 @@ def report_txtprod(productlist, report_date, month_flag):
 # Create text report for revenue
 #==========================================================================================
 
-def report_txtrev(revenue, report_date, month_flag):
+def report_txtrev(revenue, report_date):
 
-    if month_flag:
+    if month_flag(report_date):
         reportdate = datetime.strptime(report_date + '-01'.strip("'"), '%Y-%m-%d')
         report_date = reportdate.strftime("%B %Y")
 
@@ -65,9 +66,9 @@ def report_txtrev(revenue, report_date, month_flag):
 # Create text report for profit
 #==========================================================================================
 
-def report_txtprofit(profit, report_date, month_flag):
+def report_txtprofit(profit, report_date):
 
-    if month_flag:
+    if month_flag(report_date):
         reportdate = datetime.strptime(report_date + '-01'.strip("'"), '%Y-%m-%d')
         report_date = reportdate.strftime("%B %Y")
 
@@ -77,12 +78,12 @@ def report_txtprofit(profit, report_date, month_flag):
 # Create text report for bought items
 #==========================================================================================
 
-def report_txtbought(outputlist, report_date, month_flag):
+def report_txtbought(outputlist, report_date):
 
     # Check if data has to be reported
     if len(outputlist) != 0:
 
-        if month_flag:
+        if month_flag(report_date):
             reportdate = datetime.strptime(report_date + '-01'.strip("'"), '%Y-%m-%d')
             report_date = reportdate.strftime("%B %Y")
 
@@ -105,12 +106,12 @@ def report_txtbought(outputlist, report_date, month_flag):
 # Create text report for sold items
 #==========================================================================================
 
-def report_txtsold(outputlist, report_date, month_flag):
+def report_txtsold(outputlist, report_date):
 
     # Check if data has to be reported
     if len(outputlist) != 0:
 
-        if month_flag:
+        if month_flag(report_date):
             reportdate = datetime.strptime(report_date + '-01'.strip("'"), '%Y-%m-%d')
             report_date = reportdate.strftime("%B %Y")
 
@@ -137,17 +138,17 @@ def main():
 
     # Check reports
     print(report_txtinv([['Orange', 2, 1], ['Apple', 0, 1]], '2021-01-14'))
-    print(report_txtprod({'Orange', 'Apple', 'Banana'}, '2021-01-04', False))
-    print(report_txtprod({'Orange', 'Apple', 'Banana'}, '2021-01', True))
-    print(report_txtrev(4.5, '2021-01-01', False))
-    print(report_txtrev(4.5, '2021-01', True))
-    print(report_txtprofit(1.45, '2021-01-01', False))
-    print(report_txtprofit(1.45, '2021-06', True))
-    print(report_txtbought({'0': ['Orange', "'2021-01-01'", 4, "'2021-02-15'"]}, '2021-01-14', False))
-    print(report_txtbought({'0': ['Orange', "'2021-01-01'", 4, "'2021-02-15'"]}, '2021-01', True))
-    print(report_txtsold([['Orange', "'2021-01-01'", 4, "'2021-02-15'"]], '2021-01-14', False))
-    print(report_txtsold([['Orange', "'2021-01-01'", 4, "'2021-02-15'"]], '2021-01', True))
-    print(report_txtsold([], '2021-01', True))
+    print(report_txtprod({'Orange', 'Apple', 'Banana'}, '2021-01-04'))
+    print(report_txtprod({'Orange', 'Apple', 'Banana'}, '2021-01'))
+    print(report_txtrev(4.5, '2021-01-01'))
+    print(report_txtrev(4.5, '2021-01'))
+    print(report_txtprofit(1.45, '2021-01-01'))
+    print(report_txtprofit(1.45, '2021-06'))
+    print(report_txtbought({'0': ['Orange', "'2021-01-01'", 4, "'2021-02-15'"]}, '2021-01-14'))
+    print(report_txtbought({'0': ['Orange', "'2021-01-01'", 4, "'2021-02-15'"]}, '2021-01'))
+    print(report_txtsold([['Orange', "'2021-01-01'", 4, "'2021-02-15'"]], '2021-01-14'))
+    print(report_txtsold([['Orange', "'2021-01-01'", 4, "'2021-02-15'"]], '2021-01'))
+    print(report_txtsold([], '2021-01'))
     return
 
 

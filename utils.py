@@ -95,6 +95,12 @@ def clearfile(filename):
         return f"ERROR, can't erase file {filename}"
 
 
+def month_flag(report_date):
+    # Check if report for date or month
+    return False if len(report_date) > 7 else True
+
+
+
 # ---------------------------------------------------------------------------------------------
 # Test routine
 # ---------------------------------------------------------------------------------------------

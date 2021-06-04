@@ -6,11 +6,11 @@ from graphreport import report_graph
 from sell import read_sold
 from buy import read_bought
 from datetime import datetime, timedelta
+from utils import month_flag
 
 # ---------------------------------------------------------------------------------------------
 # Class which calculates the sum of a column in a dictionary
 # ---------------------------------------------------------------------------------------------
-
 
 class Finance:
     def __init__(self, header, amount, column):
@@ -22,14 +22,10 @@ class Finance:
 # Report inventory on certain date and return products in store and expired products in a list
 # ---------------------------------------------------------------------------------------------
 
-
 def report_inventory(report_date, exportcsv, showgraph):
 
     # Convert report date to date object
-    try:
-        rep_date = datetime.strptime(report_date.strip("'"), '%Y-%m-%d')
-    except BaseException:
-        return 'ERROR, Wrong date format'
+    rep_date = datetime.strptime(report_date.strip("'"), '%Y-%m-%d')
 
     # Read products bought and create list with all products
     bought = read_bought(report_date)
@@ -77,7 +73,6 @@ def report_inventory(report_date, exportcsv, showgraph):
 
     # Check if output data available
     if len(outputlist) != 0:
-
         if exportcsv: 
             # Export inventory to REPORT.CSV
             return report_csvitems(outputlist)          
@@ -87,47 +82,37 @@ def report_inventory(report_date, exportcsv, showgraph):
         else:  
             # Create text report
             return report_txtinv(outputlist, report_date)  
-
     else:
         return 'No data available'
+
 
 # ---------------------------------------------------------------------------------------------
 # Report all products bought before report-date
 # --------------------------------------------------------------------------------------------
 
-
 def report_products(report_date, exportcsv):
-
-    # Check if report for date or month
-    month_flag = False if len(report_date) > 7 else True
 
     # Read products bought and create list with all products
     bought = read_bought(report_date)
-    #productlist = []
     productlist = set([item[1][0] for item in bought.items()])
 
     # Check if output data available, if so report data
     if len(productlist) != 0:
-
         if exportcsv: 
             # Export inventory to REPORT.CSV
             return report_csvrow(productlist)                           
         else:         
             # Create text report
-            return report_txtprod(productlist, report_date, month_flag) 
-
+            return report_txtprod(productlist, report_date) 
     else:
         return 'No data available'
+
 
 # ---------------------------------------------------------------------------------------------
 # Revenue report, print revenue on a given date.
 # ---------------------------------------------------------------------------------------------
 
-
 def report_revenue(report_date, exportcsv):
-
-    # Check if report for date or month
-    month_flag = False if len(report_date) > 7 else True
 
     # Read products sold
     sold = read_sold(report_date)
@@ -141,16 +126,14 @@ def report_revenue(report_date, exportcsv):
         return report_csvrow(revenue)                           
     else:         
         # Create text report
-        return report_txtrev(revenue, report_date, month_flag)  
+        return report_txtrev(revenue, report_date)  
+
 
 # ---------------------------------------------------------------------------------------------
 # Report profit on report-date
 # ---------------------------------------------------------------------------------------------
 
 def report_profit(report_date, exportcsv):
-
-    # Check if report for date or month
-    month_flag = False if len(report_date) > 7 else True
 
     # Read products bought and sold
     bought = read_bought(report_date)
@@ -166,27 +149,25 @@ def report_profit(report_date, exportcsv):
     if (len(bought) != 0) or (len(sold) != 0):
         if exportcsv: 
             # Export inventory to REPORT.CSV
-            return report_csvrow(round(total_sold.amount - total_bought.amount, 2))                  
+            return report_csvrow([round(total_sold.amount - total_bought.amount, 2)])                  
         else:
             # Create text report
-            return report_txtprofit(total_sold.amount - total_bought.amount, report_date, month_flag)   
+            return report_txtprofit(total_sold.amount - total_bought.amount, report_date)   
     else:
         return 'No data available'
+
 
 # ---------------------------------------------------------------------------------------------
 # Report products + info bought before report-date
 # ---------------------------------------------------------------------------------------------
 
-
 def report_bought(report_date, exportcsv):
-
-    # Check if report for date or month
-    month_flag = False if len(report_date) > 7 else True
 
     # Read bought products
     bought = read_bought(report_date)
 
     # Create outputlist
+    outputlist=[]
     for key in bought:
         name_out = bought[key][0]
         buydate_out = bought[key][1]
@@ -196,26 +177,21 @@ def report_bought(report_date, exportcsv):
 
     # Check if output data available
     if len(bought) != 0:
-
         if exportcsv:
             # Export inventory to REPORT.CSV
             return report_csvitems(outputlist)
         else:
             # Create text report
-            return report_txtbought(bought, report_date, month_flag)
-
+            return report_txtbought(bought, report_date)
     else:
         return 'No data available'
+
 
 # ---------------------------------------------------------------------------------------------
 # Report products + info sold or expired on report-date
 # ---------------------------------------------------------------------------------------------
 
-
 def report_sold(report_date, exportcsv):
-
-    # Check if report for date or month
-    month_flag = False if len(report_date) > 7 else True
 
     # Read all bought and sold products
     bought = read_bought('All')
@@ -238,13 +214,12 @@ def report_sold(report_date, exportcsv):
     bought = read_bought(report_date)
 
     try:
-        if month_flag:
+        if month_flag(report_date):
             startdate = datetime.strptime(report_date + '-01'.strip("'"), '%Y-%m-%d')
         else:
             startdate = datetime.strptime(report_date.strip("'"), '%Y-%m-%d')
         enddate = (startdate.replace(day=1) +
                    timedelta(days=32)).replace(day=1) - timedelta(days=1)
-
     except BaseException:
         return 'ERROR, Wrong date format'
 
@@ -264,13 +239,12 @@ def report_sold(report_date, exportcsv):
 
     # Check if output data available
     if len(outputlist) != 0:
-
-        # Export inventory to REPORT.CSV
         if exportcsv:
+            # Export inventory to REPORT.CSV
             return report_csvitems(outputlist)
         else:
             # Create text report
-            return report_txtsold(outputlist, report_date, month_flag)
+            return report_txtsold(outputlist, report_date)
     else:
         return 'No data available'
 
@@ -289,7 +263,6 @@ def report_sold(report_date, exportcsv):
 # All reports can be saved as CSV files.
 # The inventory report can be shown as a bar-graphic
 # ---------------------------------------------------------------------------------------------
-
 
 def show_report(report_name, report_date, export_csv, show_graph):
 
@@ -317,7 +290,6 @@ def show_report(report_name, report_date, export_csv, show_graph):
 # Test routines
 # ---------------------------------------------------------------------------------------------
 
-
 def main():
 
     # Check reports
@@ -332,7 +304,7 @@ def main():
     print(report_products('2021-01-01', False))
     print(report_products('2021-01', False))
     print(report_bought('2021-03-01', True))
-    print(report_bought('2021-03', False))
+    print(report_bought('2021-01', False))
     print(report_sold('2021-01-12', True))
     print(report_sold('2021-01', False))
     return
