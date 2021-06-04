@@ -230,7 +230,7 @@ def report_sold(report_date, exportcsv):
             sold_date = 'Expired'
             sold_price = '-'
             expdate = datetime.strptime(bought[key][3].strip("'"), '%Y-%m-%d')
-            if month_flag:
+            if month_flag(report_date):
                 if (expdate >= startdate) and (expdate <= enddate):
                     outputlist.append([name, sold_date, sold_price, bought[key][3]])
             else:
