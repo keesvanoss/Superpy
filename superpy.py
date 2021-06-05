@@ -60,7 +60,7 @@ def main():
         if report_date is not None:
             print(
                 report.show_report(args.report_name, report_date,
-                                   args.export_csv, args.show_graph))
+                                   args.export_csv, args.show_graph, args.export_pdf))
         else:
             print(f"ERROR: missing <date>")
 

@@ -107,6 +107,11 @@ def get_arguments():
                            action='store_const',
                            const=True)
 
+    my_parser.add_argument('--export_pdf',
+                           help='export data to REPORT.PDF',
+                           action='store_const',
+                           const=True)
+
     my_parser.add_argument('--show_graph',
                            help='show bar graph of data',
                            action='store_const',

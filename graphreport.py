@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 def report_graph(outputlist, report_date):
     # Set values X/Y axis
     x = [item[0] for item in outputlist]
@@ -19,10 +20,13 @@ def report_graph(outputlist, report_date):
 
     return 'Inventory bar-graph showed'
 
+
 def main():
 
     # Check reports
-    print(report_graph([['Orange', 2, 1], ['Apple', 0, 1], ['Banana', 1, 0]], '2021-01-01'))
+    print(
+        report_graph([['Orange', 2, 1], ['Apple', 0, 1], ['Banana', 1, 0]],
+                     '2021-01-01'))
     return
 
 

@@ -1,9 +1,9 @@
 import csv
 
-
 #==========================================================================================
 # Create csv report with seperate items in a row for outputlist
 #==========================================================================================
+
 
 def report_csvitems(outputlist):
     try:
@@ -15,9 +15,11 @@ def report_csvitems(outputlist):
     except BaseException:
         return 'ERROR, in creating datafile REPORT.CSV'
 
+
 #==========================================================================================
 # Create csv report with rows for outputlist
 #==========================================================================================
+
 
 def report_csvrow(outputlist):
     try:
@@ -29,6 +31,7 @@ def report_csvrow(outputlist):
     except BaseException:
         return 'ERROR, in creating datafile REPORT.CSV'
 
+
 def report_csvbought(outputlist):
     pass
 
@@ -37,7 +40,7 @@ def main():
 
     # Check reports
     print(report_csvitems([['Orange', 2, 1], ['Apple', 0, 1]]))
-    print(report_csvrow({'Orange','Apple'}))
+    print(report_csvrow({'Orange', 'Apple'}))
     print(report_csvrow([7.00]))
     print(report_csvrow([-14.0]))
     return

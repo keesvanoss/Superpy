@@ -16,7 +16,8 @@ To run the program you need to install some extra libraries:
 - argparse
 - datetime
 - matplotlib	(additional library for submission)
-- autopep8		(additional library for submission)
+- reportlab
+(-autopep8		(additional library for submission))
 
 I used autopep8 to check the code format.
 
