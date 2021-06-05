@@ -16,10 +16,7 @@ To run the program you need to install some extra libraries:
 - argparse
 - datetime
 - matplotlib	(additional library for submission)
-- reportlab
-(-autopep8		(additional library for submission))
-
-I used autopep8 to check the code format.
+- reportlab		(additional library for submission))
 
 -----------------------------------------------------------------------------------------------------------------------
 Buying a product:
@@ -78,16 +75,17 @@ Select one of these reports:
 The syntaxes for the different reports are the following:
 
 Syntax:
-	superpy.py report inventory --date <date> --export_csv --show_graph
+	superpy.py report inventory --date <date> --export_csv --export_pdf --show_graph 
 	superpy.py report revenue   --date <date> --export_csv
 	superpy.py report profit    --date <date> --export_csv
 	superpy.py report products  --date <date> --export_csv
-	superpy.py report bought    --date <date> --export_csv
-	superpy.py report sold      --date <date> --export_csv
+	superpy.py report bought    --date <date> --export_csv --export_pdf
+	superpy.py report sold      --date <date> --export_csv --export_pdf
 
 Parameters:
 	--export_csv		, optional for output to REPORT.CSV file instead of output to screen
-	--show_graph		, optional for displaying a bar-graph of the output
+	--export_pdf		, optional for creating REPORT.PDF as report
+ 	--show_graph		, optional for displaying a bar-graph of the output
 	
 	You may replace --date <date> with several options:
 
@@ -95,7 +93,7 @@ Parameters:
 	--today				, report until current date (stored in config.txt)
 	--yesterday			, report until yesterdays date
 	--date <yyyy-mm-dd>	, report until given date yyyy-mm-dd
-	--date <yyyy-mm>	, report monthly overview
+	--date <yyyy-mm>	, report monthly overview (not for inventory!!)
 
 Examples:
 	>python3 superpy.py report inventory --date 2021-01-10
